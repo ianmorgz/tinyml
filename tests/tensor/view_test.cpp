@@ -5,7 +5,7 @@
 
 
 TEST(TensorView, Shape) {
-    const tinyml::tensor::Tensor<float> t( tinyml::core::Shape{2, 3});
+    const tinyml::tensor::Tensor<float> t( tinyml::core::Shape{2u, 3u});
     const auto t_v = t.view();
 
     EXPECT_EQ(t_v.shape().rank, 2);
@@ -16,7 +16,7 @@ TEST(TensorView, Shape) {
 }
 
 TEST(TensorView, EmptyTensorView) {
-    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2, 3} );
+    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2u, 3u} );
     const auto t_v = t.view();
 
     ASSERT_NE(t.data(), nullptr);
@@ -27,7 +27,7 @@ TEST(TensorView, EmptyTensorView) {
 }
 
 TEST(TensorView, TensorViewCreation) {
-    const tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    const tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     const auto t_v = t.view();
 
     ASSERT_NE(t_v.data(), nullptr);
@@ -38,7 +38,7 @@ TEST(TensorView, TensorViewCreation) {
 }
 
 TEST(TensorView, TensorViewCopyable) {
-    const tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    const tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     const auto t_v1 = t.view();
     const auto t_v2 = t_v1;
 
@@ -50,7 +50,7 @@ TEST(TensorView, TensorViewCopyable) {
 }
 
 TEST(TensorView, Accessors) {
-    tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2, 4}, 3.0f);
+    tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2u, 4u}, 3.0f);
     const auto t_v = t.view();
 
     ASSERT_EQ(t_v.size(), 8);
@@ -65,7 +65,7 @@ TEST(TensorView, Accessors) {
 }
 
 TEST(TensorView, TensorViewReferencesOwner) {
-    tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     const auto t_v = t.view();
 
     t.fill(2.0f);
@@ -76,7 +76,7 @@ TEST(TensorView, TensorViewReferencesOwner) {
 }
 
 TEST(TensorView, TensorViewDestroyable) {
-    tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     if constexpr (true ) {
         const auto t_v = t.view();
         EXPECT_EQ(t_v.data(), t.data());
@@ -88,7 +88,7 @@ TEST(TensorView, TensorViewDestroyable) {
 }
 
 TEST(TensorView, TensorViewMutable) {
-    tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     const auto t_v = t.view();
     ASSERT_NO_THROW(t_v.data()[0] = 2.0f);
     EXPECT_EQ(t_v.data()[0], 2.0f);
@@ -96,7 +96,7 @@ TEST(TensorView, TensorViewMutable) {
 }
 
 TEST(TensorView, MultipleTensorViewWriting) {
-    tinyml::tensor::Tensor<float> t({2, 3}, 1.0f);
+    tinyml::tensor::Tensor<float> t({2u, 3u}, 1.0f);
     const auto t_v1 = t.view();
     const auto t_v2 = t.view();
 

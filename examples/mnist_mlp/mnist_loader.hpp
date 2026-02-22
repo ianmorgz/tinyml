@@ -68,8 +68,6 @@ public:
             im.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(buf.size()));
             if (!im) TINYML_EXCEPTION("MNIST: failed to read image payload");
 
-
-
             // X row i
             float* xrow = X + i * pixels;
             for (std::size_t p = 0; p < pixels; ++p) {

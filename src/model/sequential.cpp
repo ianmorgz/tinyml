@@ -20,10 +20,10 @@ void Sequential::throw_if_not_built() const {
 void Sequential::build(const std::size_t input_size, const std::size_t max_batch) {
     if (layers_.empty()) { TINYML_EXCEPTION("Sequential model is empty"); }
 
-    layer_sizes.clear();
+    layer_sizes_.clear();
     model_params_.clear();
-    layer_sizes.reserve(layers_.size() + 1);
-    layer_sizes.push_back(input_size);
+    layer_sizes_.reserve(layers_.size() + 1);
+    layer_sizes_.push_back(input_size);
 
     core::Shape current_shape({static_cast<std::uint32_t>(max_batch), static_cast<std::uint32_t>(input_size)});
     std::size_t max_layer_elem = current_shape.flat_size();
@@ -32,14 +32,14 @@ void Sequential::build(const std::size_t input_size, const std::size_t max_batch
         current_shape = layer->infer_output_shape(current_shape);
         if (current_shape.rank != 2) { TINYML_EXCEPTION("Model build: layer outputed incorrectly sized shape"); }
         if (const size_t current_shape_size = current_shape.flat_size(); current_shape_size > max_layer_elem) { max_layer_elem = current_shape_size; }
-        layer_sizes.push_back(current_shape[1]);
+        layer_sizes_.push_back(current_shape[1]);
 
         // get and store the layer params
         auto lp = layer->params(); // span into layer-owned array
         model_params_.insert(model_params_.end(), lp.begin(), lp.end());
     }
 
-    input_features_ = layer_sizes[0];
+    input_features_ = layer_sizes_[0];
     output_features_ = current_shape[1];
     max_features_ = max_layer_elem;
     max_batch_size_ = max_batch;
@@ -67,7 +67,7 @@ tensor::TensorView<const float> Sequential::forward(const tensor::TensorView<con
 
 
     for (std::size_t i = 0; i < layers_.size(); ++i) {
-        core::Shape out_shape({static_cast<std::uint32_t>(batch_size), static_cast<std::uint32_t>(layer_sizes[i+1])});
+        core::Shape out_shape({static_cast<std::uint32_t>(batch_size), static_cast<std::uint32_t>(layer_sizes_[i+1])});
 
         tensor::TensorView<float> out_view = write_to_a
         ? tensor::TensorView(act_a_.data(), out_shape)
@@ -92,7 +92,7 @@ tensor::TensorView<const float> Sequential::forward_train(const tensor::TensorVi
 
     const std::size_t batch_size = in.shape()[0];
     for (std::size_t i = 0; i < layers_.size(); ++i) {
-        core::Shape out_shape({static_cast<std::uint32_t>(batch_size), static_cast<std::uint32_t>(layer_sizes[i+1])});
+        core::Shape out_shape({static_cast<std::uint32_t>(batch_size), static_cast<std::uint32_t>(layer_sizes_[i+1])});
 
         tensor::TensorView<float> out_view =
             (write_to_a ? tensor::TensorView(act_a_.data(), out_shape) : tensor::TensorView(act_b_.data(), out_shape));
@@ -129,7 +129,7 @@ void Sequential::backwards_train(const tensor::TensorView<const float>& output_g
     for (std::size_t i = layers_.size(); i-- > 0; ) {
         core::Shape in_shape({
             static_cast<std::uint32_t>(batch_size),
-            static_cast<std::uint32_t>(layer_sizes[i])
+            static_cast<std::uint32_t>(layer_sizes_[i])
         });
 
         const tensor::TensorView<const float> layer_input = ctx.get_cache(i);

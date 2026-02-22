@@ -1,0 +1,22 @@
+#include "tinyml/quant/qrelu.hpp"
+
+namespace tinyml::quant {
+
+// perform a relu sort with abs max
+void QRelu::forward(const tensor::TensorView<const int8_t> in, tensor::TensorView<int8_t> out) const {
+    const int8_t* i = in.data();
+    int8_t* o = out.data();
+    const std::size_t n = in.size();
+
+    for (std::size_t j = 0; j < n; ++j) {
+        o[j] = std::max(i[j], param_.zero_point);
+    }
+}
+
+QParam QRelu::finalize_callibration(const model::Layer& layer, const QParam input_param) {
+    param_ = input_param;
+    callibrated_ = true;
+
+    return input_param;
+}
+}

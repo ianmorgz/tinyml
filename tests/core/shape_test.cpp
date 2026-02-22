@@ -3,7 +3,7 @@
 #include <tinyml/tensor/tensor.hpp>
 
 TEST(TensorShape, NumDimAndFlatSize) {
-    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2, 3});
+    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2u, 3u});
 
     EXPECT_EQ(t.shape().rank, 2);
     EXPECT_EQ(t.shape()[0], 2);
@@ -22,7 +22,7 @@ TEST(TensorShape, EmptyTensor) {
 }
 
 TEST(TensorShape, LargeTensor) {
-    const tinyml::tensor::Tensor<float> t({100, 100, 100});
+    const tinyml::tensor::Tensor<float> t({100u, 100u, 100u});
 
     EXPECT_EQ(t.shape().rank, 3);
     EXPECT_EQ(t.shape()[0], 100);
@@ -32,7 +32,7 @@ TEST(TensorShape, LargeTensor) {
 }
 
 TEST(TensorShape, TensorThrowException) {
-    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2, 3});
+    const tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2u, 3u});
 
     EXPECT_ANY_THROW(t.shape()[2]);
     EXPECT_ANY_THROW(t.shape()[100]);

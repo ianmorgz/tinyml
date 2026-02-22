@@ -1,6 +1,6 @@
-#include <../../include/tinyml/core/context.hpp>
 #include <gtest/gtest.h>
 
+#include "tinyml/train/context.hpp"
 #include "tinyml/model/dense.hpp"
 #include "tinyml/model/relu.hpp"
 #include "tinyml/model/sequential.hpp"

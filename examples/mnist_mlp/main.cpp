@@ -1,8 +1,7 @@
 #include <iostream>
-
 #include "mnist_loader.hpp"
 #include "tinyml/dataset/dataset.hpp"
-#include "tinyml/model/dense.hpp"
+#include "tinyml/quant/qsequential.hpp"
 #include "tinyml/model/sequential.hpp"
 #include "tinyml/train/fit.hpp"
 
@@ -26,4 +25,22 @@ int main() {
         .optimizer = train::Optimizer::SGD,
         .loss_function = train::LossFunction::CrossEntropy,
     });
+
+    quant::QSequential qnet(model, dataset, 10000);
+
+    //DEBUG test the quantized forward method
+    dataset.shuffle_training(42);
+    dataset::BatchView batch_view;
+    dataset.next_training_batch(1, batch_view);
+
+    auto in = batch_view.input;
+    auto lbl = batch_view.label;;
+
+
+    tensor::Tensor<const float> out(lbl.shape());
+    out.view() = qnet.forward(in);
+
+    for (std::size_t i = 0; i < out.size(); ++i) {
+        std::cout << "output: " << out[i] << " | expected: " << lbl[i] << std::endl;
+    }
 }

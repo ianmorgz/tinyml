@@ -28,7 +28,8 @@ public:
     std::size_t output_features() const noexcept { return output_features_; };
     std::size_t max_features() const noexcept { return max_features_; };
     std::size_t max_batch() const noexcept { return max_batch_size_; };
-    std::size_t layer_features(const std::size_t i) const noexcept {return layer_sizes.at(i); }
+    std::size_t layer_feature(const std::size_t i) const noexcept {return layer_sizes_.at(i); } //TODO rename to layer_size
+    std::vector<std::size_t> layer_sizes() const noexcept { return layer_sizes_; };
     const std::vector<ParamRef>& params() const noexcept { return model_params_; };
 
     void clear_param_gradients() const;
@@ -43,7 +44,7 @@ private:
 
     // layer metadata
     std::vector<ParamRef> model_params_;
-    std::vector<std::size_t> layer_sizes;
+    std::vector<std::size_t> layer_sizes_;
     std::size_t input_features_ = 0;
     std::size_t output_features_ = 0;
     std::size_t max_features_;

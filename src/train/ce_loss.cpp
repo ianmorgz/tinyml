@@ -1,5 +1,5 @@
 #include "tinyml/train/ce_loss.hpp"
-#include <cmath> \\
+#include <cmath>
 
 #include <iostream>
 #include <ostream>

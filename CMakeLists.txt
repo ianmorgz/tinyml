@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
+
 project(tinyml VERSION 0.4.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -9,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ----------- Options ----------
 option(TINYML_BUILD_TESTS "Build unit tests" ON)
 option(TINYML_BUILD_EXAMPLES "Build examples" ON)
-option(TINYML_ENABLE_SANITIZERS "Enable ASan/UBSan on supported platforms" OFF)
+option(TINYML_ENABLE_SANITIZERS "Enable ASan/UBSan on supported platforms" ON)
 
 # ---------- Library ----------
 add_library(tinyml
@@ -26,6 +31,11 @@ add_library(tinyml
         src/train/ce_loss.cpp
 
         src/dataset/dataset.cpp
+
+        src/quant/qsequential.cpp
+        src/quant/qdense.cpp
+        src/quant/qrelu.cpp
+        src/quant/qtanh.cpp
 )
 
 target_include_directories(tinyml
@@ -47,55 +57,36 @@ endif()
 if(TINYML_BUILD_EXAMPLES)
     add_executable(mnist examples/mnist_mlp/main.cpp)
     target_link_libraries(mnist PRIVATE tinyml)
+
+    add_executable(ex_mlp examples/ex_mlp/ex_mlp.cpp)
+    target_link_libraries(ex_mlp PRIVATE tinyml)
 endif()
 
 # ---------- Tests ----------
-#if (TINYML_BUILD_TESTS)
-#    include(CTest)
-#    enable_testing()
-#
-#    include(FetchContent)
-#
-#    FetchContent_Declare(
-#            googletest
-#            URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-#    )
-#
-#    # Prevent MSVC runtime mismatch (safe on all platforms)
-#    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-#
-#    FetchContent_MakeAvailable(googletest)
-#
-#    add_executable(tinyml_tests
-#            # core
-#            tests/core/shape_test.cpp
-##            tests/core/buffer_view_test.cpp
-##
-##            #tensor
-##            tests/tensor/view_test.cpp
-##            tests/tensor/tensor_test.cpp
-##
-##            #internal
-##            tests/internal/aligned_buffer_test.cpp
-##
-##            #model
-##            tests/model/dense_test.cpp
-##            tests/model/relu_test.cpp
-##            tests/model/sequential_test.cpp
-##
-##            #train
-##            tests/train/context_tests.cpp
-#
-#            # add more test files here
-#    )
-#
-#    target_link_libraries(tinyml_tests
-#            PRIVATE
-#            tinyml
-#            GTest::gtest_main
-#    )
-#
-#    include(GoogleTest)
-#    gtest_discover_tests(tinyml_tests)
+if (TINYML_BUILD_TESTS)
+    add_subdirectory(tests)
 
-#endif()
+endif()
+
+# ---------- Sanitizers (Debug on host) ----------
+if (TINYML_ENABLE_SANITIZERS AND NOT MSVC)
+    set(TINYML_SAN_FLAGS -fsanitize=address,undefined -fno-omit-frame-pointer)
+
+    # Apply to library compile
+    target_compile_options(tinyml PRIVATE ${TINYML_SAN_FLAGS})
+
+    # Apply to any final link targets (executables)
+    if (TINYML_BUILD_TESTS)
+        target_compile_options(tinyml_tests PRIVATE ${TINYML_SAN_FLAGS})
+        target_link_options(tinyml_tests PRIVATE ${TINYML_SAN_FLAGS})
+    endif()
+
+    if (TINYML_BUILD_EXAMPLES)
+        target_compile_options(mnist_mlp PRIVATE ${TINYML_SAN_FLAGS})
+        target_link_options(mnist_mlp PRIVATE ${TINYML_SAN_FLAGS})
+
+        target_compile_options(ex_mlp PRIVATE ${TINYML_SAN_FLAGS})
+        target_link_options(ex_mlp PRIVATE ${TINYML_SAN_FLAGS})
+    endif()
+endif()
+

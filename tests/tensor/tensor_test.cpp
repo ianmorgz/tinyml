@@ -13,7 +13,7 @@ TEST(Tensor, TypeTraits) {
 }
 
 TEST(Tensor, Accessors) {
-    tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2, 4}, 3.0f);
+    tinyml::tensor::Tensor<float> t(tinyml::core::Shape{2u, 4u}, 3.0f);
 
     ASSERT_EQ(t.size(), 8);
     for (size_t i = 0; i < t.size(); i++) {
@@ -36,7 +36,7 @@ TEST(Tensor, DefaultConstructorIsEmpty) {
 }
 
 TEST(Tensor, ConsructorShapeMatchesMetadata) {
-    constexpr tinyml::core::Shape s{2, 3};
+    constexpr tinyml::core::Shape s{2u, 3u};
     const tinyml::tensor::Tensor<float> t(s);
 
     EXPECT_EQ(t.rank(), 2);
@@ -46,7 +46,7 @@ TEST(Tensor, ConsructorShapeMatchesMetadata) {
 }
 
 TEST(Tensor, FillWritesAllElements) {
-    tinyml::tensor::Tensor<int8_t> t(tinyml::core::Shape{2, 3});
+    tinyml::tensor::Tensor<int8_t> t(tinyml::core::Shape{2u, 3u});
     t.fill(7);
 
     for (size_t i = 0; i < t.size(); i++) {
@@ -56,7 +56,7 @@ TEST(Tensor, FillWritesAllElements) {
 }
 
 TEST(Tensor, ConstViewIsReadOnly) {
-    tinyml::tensor::Tensor<float> temp(tinyml::core::Shape{2, 3});
+    tinyml::tensor::Tensor<float> temp(tinyml::core::Shape{2u, 3u});
     temp.fill(1.0f);
 
     const tinyml::tensor::Tensor<float>& t = temp;
@@ -68,7 +68,7 @@ TEST(Tensor, ConstViewIsReadOnly) {
 }
 
 TEST(Tensor, MoveLeavesSourceInSafeEmptyState) {
-    tinyml::tensor::Tensor<float> a(tinyml::core::Shape{2, 2}, 9.0f, /*alignment=*/64);
+    tinyml::tensor::Tensor<float> a(tinyml::core::Shape{2u, 2u}, 9.0f, /*alignment=*/64);
 
     void* p_a = a.data();
     ASSERT_NE(p_a, nullptr);

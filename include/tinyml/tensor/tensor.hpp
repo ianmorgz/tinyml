@@ -34,7 +34,7 @@ public:
     Tensor(const Tensor&) = delete;
     Tensor& operator=(const Tensor&) = delete;
 
-    Tensor(Tensor&& other) noexcept : shape_(other.shape_), buf_(std::move(other.buf_)){ other.shape_ = {}; };
+    Tensor(Tensor&& other) noexcept : shape_(other.shape_), buf_(std::move(other.buf_)){ other.shape_ = core::Shape{}; };
     Tensor& operator=(Tensor&& other) noexcept {
         if (this != &other) {
             shape_ = other.shape_;

@@ -61,7 +61,6 @@ void Dense::forward(const tensor::TensorView<const float> in, const tensor::Tens
     if (in.size() != expected_in) { TINYML_EXCEPTION("Dense forward: wrong input size"); }
     if (out.size() != expected_out) { TINYML_EXCEPTION("Dense forward: wrong output size"); }
 
-    // Mathy implementation
     const float* x = in.data();
     float* y = out.data();
 
