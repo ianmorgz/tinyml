@@ -7,7 +7,7 @@ namespace tinyml::quant {
 
 QDense::QDense(const model::Dense& d) : weights_(core::Shape{d.in_features(), d.out_features()}), w_scales_(core::Shape{d.out_features()}),
     biases_((core::Shape{d.out_features()})),
-    in_features_(d.in_features()), out_features_(d.out_features()) {
+    in_features_(d.in_features()), out_features_(d.out_features()), out_param_(QParam()),  in_param_(QParam()) {
         quantize_weights(d.weights());
 }
 
@@ -36,7 +36,7 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
 
         for (std::size_t i = 0; i < in_features_; ++i) {
             const float wf = w_fp32[i * out_features_ + o];
-            const int32_t q = static_cast<int32_t>(std::lrintf(wf / s));
+            const float q = (wf / s);
             w_i8[i * out_features_ + o] = QParam::clamp_int8(q);
         }
     }
@@ -94,15 +94,15 @@ void QDense::forward(tensor::TensorView<const int8_t> in, tensor::TensorView<int
     if (n_o != out_features_) { TINYML_EXCEPTION("Quantized Dense forward input tensor incorectly sized"); }
     if (n_i != in_features_) { TINYML_EXCEPTION("Quantized Dense forward output tensor incorectly sized"); }
 
-    for (std::size_t i = 0; i < n_o; i++) {
-        a_i32[i] = 0;
-        for (std::size_t j = 0; j < n_i; j++) {
-            a_i32[i] += (i_i8[j] - in_param_.zero_point) * w_i8[i * n_o + j];
+    for (std::size_t o = 0; o < n_o; o++) {
+        a_i32[o] = 0;
+        for (std::size_t i = 0; i < n_i; i++) {
+            a_i32[o] += (i_i8[i] - in_param_.zero_point) * w_i8[i * n_o + o];
         }
-        a_i32[i] += b_i32[i];
+        a_i32[o] += b_i32[o];
 
-        const float M = (in_param_.scale * ws_fp32[i]) / out_param_.scale ;
-        o_i8[i] = QParam::clamp_int8(std::round(a_i32[i] * M) + out_param_.zero_point);
+        const float M = (in_param_.scale * ws_fp32[o]) / out_param_.scale ;
+        o_i8[o] = QParam::clamp_int8(std::round(a_i32[o] * M) + out_param_.zero_point);
     }
 }
 

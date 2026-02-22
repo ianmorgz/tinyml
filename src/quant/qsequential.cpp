@@ -107,7 +107,7 @@ void QSequential::finalize(model::Sequential &net) {
 }
 
 // forward pass
-tensor::TensorView<const float> QSequential::forward(const tensor::TensorView<const float> &in) const{
+void QSequential::forward(const tensor::TensorView<const float> &in, tensor::TensorView<float> &out) const{
     // no batches for forward quantized as it's not realistic
     if (in.size() != layer_sizes_[0]) {
         TINYML_EXCEPTION("Quantized Sequential model forward given invalid size");
@@ -136,10 +136,8 @@ tensor::TensorView<const float> QSequential::forward(const tensor::TensorView<co
     }
 
 
-    tensor::Tensor<float> output({layer_sizes_[num_layers]});
+    QParam::dequantize_i8(in_view, out, output_param_);
 
-    QParam::dequantize_i8(in_view, output.view(), output_param_);
-    return output.view().as_const();
 }
 
 }

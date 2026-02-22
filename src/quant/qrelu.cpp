@@ -14,6 +14,8 @@ void QRelu::forward(const tensor::TensorView<const int8_t> in, tensor::TensorVie
 }
 
 QParam QRelu::finalize_callibration(const model::Layer& layer, const QParam input_param) {
+    (void) layer;
+
     param_ = input_param;
     callibrated_ = true;
 

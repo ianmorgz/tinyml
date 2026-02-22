@@ -32,18 +32,23 @@ int main() {
     std::size_t num = 40;
     std::size_t correct = 0;
 
+    dataset::BatchView batch_view;
+
     for (std::size_t i = 0; i < num; ++i) {
-        dataset::BatchView batch_view;
         dataset.next_training_batch(1, batch_view);
 
         auto in = batch_view.input;
-        auto lbl = batch_view.label;;
+        auto lbl = batch_view.label;
+
+        std::cout << "label shape: " << lbl.size() << std::endl;
 
         tensor::Tensor<const float> out(lbl.shape());
         out.view() = qnet.forward(in);
 
-        if (out[0] >= 0.5f) { correct++; }
+        std::cout << "[" << in[0] << ", " << in[1] << " ->: " << out[0] << " | " << lbl[0] << "\n";
+
+        // if ((out[i] < 0 && lbl[0] < 0) || (out[i] < 0 && lbl[0] < 0)) { correct++; }
     }
 
-    std::cout << "non zero: " << correct << "/" << num << std::endl;
+    // std::cout << "non zero: " << correct << "/" << num << std::endl;
 };

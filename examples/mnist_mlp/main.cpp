@@ -19,7 +19,7 @@ int main() {
     model.build(784, 100);
 
     train::fit(model, dataset, {
-        .epochs = 1,
+        .epochs = 2,
         .batch_size = 100,
         .learning_rate = 0.01f,
         .optimizer = train::Optimizer::SGD,
@@ -31,16 +31,50 @@ int main() {
     //DEBUG test the quantized forward method
     dataset.shuffle_training(42);
     dataset::BatchView batch_view;
-    dataset.next_training_batch(1, batch_view);
 
-    auto in = batch_view.input;
-    auto lbl = batch_view.label;;
+    std::size_t testing_size = 20;
+    int correct = 0;
+    for (std::size_t i = 0; i < testing_size; ++i) {
+        dataset.next_training_batch(1, batch_view);
+
+        auto in = batch_view.input;
+        auto lbl = batch_view.label;;
+
+        tensor::Tensor<float> q_out(lbl.shape());
+        auto qout_view = q_out.view();
+        // tensor::Tensor<float> fp32_out(lbl.shape());
+
+        auto o = model.forward(in);
+        qnet.forward(in, qout_view);
 
 
-    tensor::Tensor<const float> out(lbl.shape());
-    out.view() = qnet.forward(in);
+        const float* q_o = q_out.data();
+        const float* fp32_o = o.data();
+        const float* l = lbl.data();
+        std::size_t sz = lbl.size();
 
-    for (std::size_t i = 0; i < out.size(); ++i) {
-        std::cout << "output: " << out[i] << " | expected: " << lbl[i] << std::endl;
+        // float max_out = -100;
+        // float max_lbl = -100;
+        //
+        // std::size_t max_out_idx = 0;
+        // std::size_t max_lbl_idx = 0;
+
+        // if (i%100 == 0) {
+            for (std::size_t j = 0; j < sz; ++j) {
+                std::cout << (j+1) << ": fp32net: " << fp32_o[j] << ", quantnet: " << q_o[j] << " : Expected: " << l[j] << std::endl;
+            }
+            std::cout << "===============\n";
+        // }
+
+
+        // for (std::size_t j = 0; j < sz; ++j) {
+        //     if (o[j] > max_out) {max_out = o[j]; max_out_idx = j;}
+        //     if (l[j] > max_lbl) {max_lbl = l[j]; max_lbl_idx = j;}
+        // }
+        //
+        // if (max_out_idx == max_lbl_idx) { correct++; }
     }
-}
+
+    std::cout << correct << "/" << testing_size << std::endl;
+
+};

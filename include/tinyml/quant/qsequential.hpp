@@ -12,7 +12,8 @@ public:
 
     QSequential(model::Sequential& net, dataset::Dataset& ds, std::size_t callibration_size);
 
-    tensor::TensorView<const float> forward(const tensor::TensorView<const float> &in) const;
+    // TODO change forward pipleline into an arguement return instead of a trad return
+    void forward(const tensor::TensorView<const float> &in, tensor::TensorView<float> &out) const;
 
 private:
     std::vector<std::unique_ptr<QLayer>> layers_;
