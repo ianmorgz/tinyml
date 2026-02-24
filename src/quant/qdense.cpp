@@ -9,15 +9,13 @@ QDense::QDense(const model::Dense& d) : weights_(core::Shape{d.in_features(), d.
     biases_((core::Shape{d.out_features()})),
     in_features_(d.in_features()), out_features_(d.out_features()), out_param_(QParam()),  in_param_(QParam()) {
         quantize_weights(d.weights());
-        c_min = std::numeric_limits<float>::infinity();
-        c_max = -std::numeric_limits<float>::infinity();
 }
 
 void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weights) {
     if (fp32_weights.rank() != 2) {
         TINYML_EXCEPTION("Dense Layer Quantization: incorrect rank for fp32 weights");
     }
-    // fp32_weights is [in_features_][out_features_]
+
     if (fp32_weights.shape()[0] != in_features_ || fp32_weights.shape()[1] != out_features_) {
         TINYML_EXCEPTION("Dense Layer Quantization: incorrect shape for fp32 weights");
     }
@@ -26,6 +24,7 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
     int8_t* w_i8 = weights_.data();      // in, out
     float* ws_fp32 = w_scales_.data();
 
+    // quantization based on a per channel(output) basis
     for (std::size_t o = 0; o < out_features_; ++o) {
         float abs_max = 0.0f;
         for (std::size_t i = 0; i < in_features_; ++i) {
@@ -33,12 +32,13 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
             if (w > abs_max) abs_max = w;
         }
 
-        const float s = (abs_max > 0.0f) ? (abs_max / 127.0f) : 1.0f;
-        ws_fp32[o] = s;
+        const QParam channel_param(abs_max, -abs_max, QType::Symmetric);
+        ws_fp32[o] = channel_param.scale;
 
+
+        const float inv_s = 1/channel_param.scale;
         for (std::size_t i = 0; i < in_features_; ++i) {
-            const float wf = w_fp32[i * out_features_ + o];
-            const float q = (wf / s);
+            const float q = (w_fp32[i * out_features_ + o] * inv_s);
             w_i8[i * out_features_ + o] = QParam::clamp_int8(q);
         }
     }
@@ -57,7 +57,7 @@ void QDense::observe_fp32_output(const tensor::TensorView<const float> out) {
     }
 }
 
-QParam QDense::finalize_callibration(const model::Layer& layer, const QParam input_param) {
+QParam QDense::finalize_calibration(const model::Layer& layer, const QParam input_param) {
     if (layer.type() != model::LayerType::Dense) { TINYML_EXCEPTION("Quantized Dense FInalize Callibration float layer was not type dense"); }
 
     // set the params
@@ -75,7 +75,7 @@ QParam QDense::finalize_callibration(const model::Layer& layer, const QParam inp
         );
     }
 
-    callibrated_ = true;
+    calibrated_ = true;
     return out_param_;
 }
 

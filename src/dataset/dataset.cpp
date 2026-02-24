@@ -13,6 +13,7 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
     if (training_split < 0.0f) { training_split = 0.0f; }
     if (training_split > 1.0f) { training_split = 1.0f; }
 
+    // take ownership of the loader
     loader_ = std::move(loader);
 
     Batch temp;
@@ -33,17 +34,17 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
 
     training_order_.resize(training_batch_size);
 
-    const std::size_t input_size = temp.input.shape()[1];
-    const std::size_t label_size = temp.label.shape()[1];
+    input_size_ = temp.input.shape()[1];
+    label_size_ = temp.label.shape()[1];
 
     training_.size = training_batch_size;
     testing_.size = testing_batch_size;
 
-    training_.input = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(training_batch_size), static_cast<uint32_t>(input_size)});
-    training_.label = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(training_batch_size), static_cast<uint32_t>(label_size)});
+    training_.input = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(training_batch_size), static_cast<uint32_t>(input_size_)});
+    training_.label = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(training_batch_size), static_cast<uint32_t>(label_size_)});
 
-    testing_.input = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(testing_batch_size), static_cast<uint32_t>(input_size)});
-    testing_.label = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(testing_batch_size), static_cast<uint32_t>(label_size)});
+    testing_.input = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(testing_batch_size), static_cast<uint32_t>(input_size_)});
+    testing_.label = tensor::Tensor<float>(core::Shape{static_cast<uint32_t>(testing_batch_size), static_cast<uint32_t>(label_size_)});
 
     const float* tmp_in = temp.input.data();
     const float* tmp_lbl = temp.label.data();
@@ -54,11 +55,11 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
 
     for (std::size_t i = 0; i < training_batch_size; ++i) {
         training_order_[i] = i;
-        for (std::size_t j = 0; j < input_size; ++j) {
-            tr_in[i * input_size + j] = tmp_in[i * input_size + j];
+        for (std::size_t j = 0; j < input_size_; ++j) {
+            tr_in[i * input_size_ + j] = tmp_in[i * input_size_ + j];
         }
-        for (std::size_t j = 0; j < label_size; ++j) {
-            tr_lbl[i * label_size + j] = tmp_lbl[i * label_size + j];
+        for (std::size_t j = 0; j < label_size_; ++j) {
+            tr_lbl[i * label_size_ + j] = tmp_lbl[i * label_size_ + j];
         }
     }
 
@@ -68,11 +69,11 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
 
     for (std::size_t i = training_batch_size; i < batch_size; ++i) {
         const std::size_t n = i - training_batch_size; // looping 0 -> testing_batch_size
-        for (std::size_t j = 0; j < input_size; ++j) {
-            tst_in[n * input_size + j] = tmp_in[i * input_size + j];
+        for (std::size_t j = 0; j < input_size_; ++j) {
+            tst_in[n * input_size_ + j] = tmp_in[i * input_size_ + j];
         }
-        for (std::size_t j = 0; j < label_size; ++j) {
-            tst_lbl[n * label_size + j] = tmp_lbl[i * label_size + j];
+        for (std::size_t j = 0; j < label_size_; ++j) {
+            tst_lbl[n * label_size_ + j] = tmp_lbl[i * label_size_ + j];
         }
     }
 }

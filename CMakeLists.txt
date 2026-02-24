@@ -36,6 +36,7 @@ add_library(tinyml
         src/quant/qdense.cpp
         src/quant/qrelu.cpp
         src/quant/qtanh.cpp
+        src/quant/qtest.cpp
 )
 
 target_include_directories(tinyml
@@ -58,7 +59,8 @@ if(TINYML_BUILD_EXAMPLES)
     add_executable(mnist examples/mnist_mlp/main.cpp)
     target_link_libraries(mnist PRIVATE tinyml)
 
-    add_executable(ex_mlp examples/ex_mlp/ex_mlp.cpp)
+    add_executable(ex_mlp examples/ex_mlp/ex_mlp.cpp
+            include/tinyml/quant/qtest.hpp)
     target_link_libraries(ex_mlp PRIVATE tinyml)
 endif()
 

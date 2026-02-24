@@ -9,7 +9,7 @@ class Sequential final {
 public:
     Sequential() = default;
 
-    // seuqneital model creation functions
+    // sequential model creation functions
     void add(std::unique_ptr<Layer> layer);
     void build(std::size_t input_size, std::size_t max_batch = 1);
 

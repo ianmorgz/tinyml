@@ -102,7 +102,7 @@ void QSequential::finalize(model::Sequential &net) {
     QParam qp = input_param_;
 
     for (std::size_t i = 0; i < num_layers; ++i) {
-        qp = layers_.at(i)->finalize_callibration(net.layer(i), qp);
+        qp = layers_.at(i)->finalize_calibration(net.layer(i), qp);
         if (i == num_layers - 1) {
             output_param_ = qp;
         }

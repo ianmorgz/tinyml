@@ -21,18 +21,19 @@ struct QParam {
 
     QParam() = default;
     QParam(const float scale, const int8_t zero_point, const QType type) : scale(scale), zero_point(zero_point), type(type) {}
-    QParam(const tensor::TensorView<const float> &tv, const QType qt) {
+    QParam(const tensor::TensorView<const float> &tensorview, const QType qt) {
         type = qt;
-        const float* data = tv.data();
-        const std::size_t n = tv.size();
+        const float* data = tensorview.data();
+        const std::size_t n = tensorview.size();
 
-        float min = data[0];
-        float max = data[0];
+        float min = std::numeric_limits<float>::max();
+        float max = -std::numeric_limits<float>::min();
         for (std::size_t i = 1; i < n; i++) {
             if (data[i] > max) { max = data[i]; }
             if (data[i] < min) { min = data[i]; }
         }
 
+        // edge case min and max are the same
         if (min == max) {
             scale = 1.0f;
             zero_point = 0;
@@ -97,26 +98,20 @@ struct QParam {
         return static_cast<int8_t>(q);
     }
 
-    static void quantize_i8(const tensor::TensorView<const float>& in,const tensor::TensorView<int8_t>& out, const QParam param) {
-        if (in.size() != out.size()) {
-            TINYML_EXCEPTION("Quantized Param int8 quantization input size does not match output size");
-        }
+    static void quantize_i8(const tensor::TensorView<const float>& in, const tensor::TensorView<int8_t>& out, const QParam param) {
+        if (in.size() != out.size()) { TINYML_EXCEPTION("Quantized Param int8 quantization input size does not match output size"); }
 
         const float* i_fp32 = in.data();
         int8_t* o_i8 = out.data();
         const std::size_t n = in.size();
         const float s = param.scale;
-        const int8_t z = param.zero_point;
+        const auto z = static_cast<float>(param.zero_point);
 
-        for (std::size_t i = 0; i < n; i++) {
-            o_i8[i] = clamp_int8(std::round(i_fp32[i] / s + static_cast<float>(z)));
-        }
+        for (std::size_t i = 0; i < n; i++) { o_i8[i] = clamp_int8(std::round(i_fp32[i] / s + z)); }
     }
 
     static void dequantize_i8(const tensor::TensorView<const int8_t>& in, const tensor::TensorView<float>& out, const QParam param) {
-        if (in.size() != out.size()) {
-            TINYML_EXCEPTION("Quantized Param int8 quantization input size does not match output size");
-        }
+        if (in.size() != out.size()) { TINYML_EXCEPTION("Quantized Param fp32 dequantization input size does not match output size"); }
 
         const int8_t* i_i8 = in.data();
         float* o_fp32 = out.data();
@@ -124,9 +119,7 @@ struct QParam {
         const float s = param.scale;
         const int8_t z = param.zero_point;
 
-        for (std::size_t i = 0; i < n; i++) {
-            o_fp32[i] = static_cast<float>(i_i8[i] - z) * s;
-        }
+        for (std::size_t i = 0; i < n; i++) { o_fp32[i] = static_cast<float>(i_i8[i] - z) * s; }
     }
 };
 

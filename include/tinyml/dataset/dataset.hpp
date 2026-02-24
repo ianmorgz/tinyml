@@ -19,6 +19,9 @@ public:
     bool next_training_batch(std::size_t batch_size, BatchView& out);
     bool next_testing_batch(std::size_t batch_size, BatchView& out);
 
+    std::size_t input_size() const noexcept { return input_size_; }
+    std::size_t label_size() const noexcept { return label_size_; }
+
 private:
     Batch training_;
     Batch testing_;
@@ -31,6 +34,9 @@ private:
     Batch testing_batch_;
 
     std::unique_ptr<Loader> loader_;
+
+    std::size_t input_size_;
+    std::size_t label_size_;
 };
 
 }

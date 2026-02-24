@@ -4,6 +4,12 @@
 #include "tinyml/tensor/tensor_view.hpp"
 #include "tinyml/model/layer.hpp"
 
+
+/* A quantized layer is built with the following methods
+ * 1. The layer observes the output of it's fp32 counterpart, saving necessary data to build input/output params and/or LUTs
+ * 2. the layer then finalizes it's internal structure and is ready for the forward pass
+ */
+
 namespace tinyml::quant {
 class QLayer {
 public:
@@ -15,10 +21,10 @@ public:
     // observe and output and adjust
     virtual void observe_fp32_output(tensor::TensorView<const float> out) = 0;
 
-    // build the quantized layer with obsereved adjustments returns the output param for the next layer
-    virtual QParam finalize_callibration(const model::Layer& layer, QParam input_param) = 0;
+    // build the quantized layer with observed adjustments returns the output param for the next layer
+    virtual QParam finalize_calibration(const model::Layer& layer, QParam input_param) = 0;
 
-    // check if the layer has been callibrated
-    virtual bool callibrated() const noexcept = 0;
+    // check if the layer has been calibrated
+    virtual bool calibrated() const noexcept = 0;
 };
 }
