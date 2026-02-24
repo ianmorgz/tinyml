@@ -9,6 +9,8 @@ QDense::QDense(const model::Dense& d) : weights_(core::Shape{d.in_features(), d.
     biases_((core::Shape{d.out_features()})),
     in_features_(d.in_features()), out_features_(d.out_features()), out_param_(QParam()),  in_param_(QParam()) {
         quantize_weights(d.weights());
+        c_min = std::numeric_limits<float>::infinity();
+        c_max = -std::numeric_limits<float>::infinity();
 }
 
 void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weights) {

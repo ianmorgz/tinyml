@@ -19,6 +19,9 @@ QSequential::QSequential(model::Sequential& net, dataset::Dataset& ds, const std
     // step 1 create the layers and quantize dense weights
     make_layers(net);
 
+    c_min = std::numeric_limits<float>::infinity();
+    c_max = -std::numeric_limits<float>::infinity();
+
     // step 2 callibrate pass on the float network
     callibrate(net, ds, callibration_size);
 

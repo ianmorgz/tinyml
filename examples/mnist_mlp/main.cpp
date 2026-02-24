@@ -19,7 +19,7 @@ int main() {
     model.build(784, 100);
 
     train::fit(model, dataset, {
-        .epochs = 2,
+        .epochs = 1,
         .batch_size = 100,
         .learning_rate = 0.01f,
         .optimizer = train::Optimizer::SGD,
@@ -61,7 +61,7 @@ int main() {
 
         // if (i%100 == 0) {
             for (std::size_t j = 0; j < sz; ++j) {
-                std::cout << (j+1) << ": fp32net: " << fp32_o[j] << ", quantnet: " << q_o[j] << " : Expected: " << l[j] << std::endl;
+                std::cout << (j) << ": fp32net: " << fp32_o[j] << ", quantnet: " << q_o[j] << " : Expected: " << l[j] << std::endl;
             }
             std::cout << "===============\n";
         // }

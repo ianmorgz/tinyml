@@ -89,7 +89,7 @@ struct QParam {
     }
 
     static int8_t clamp_int8(const float val) {
-        long q = std::lrintf(val);
+        int32_t q = std::lrintf(val);
 
         if (q > 127) { q = 127; }
         if (q < -127) { q = -127; }
