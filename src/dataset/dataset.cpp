@@ -33,6 +33,7 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
     const std::size_t testing_batch_size = batch_size - training_batch_size;
 
     training_order_.resize(training_batch_size);
+    testing_order_.resize(testing_batch_size);
 
     input_size_ = temp.input.shape()[1];
     label_size_ = temp.label.shape()[1];
@@ -69,6 +70,7 @@ Dataset::Dataset(std::unique_ptr<Loader> loader, float training_split) {
 
     for (std::size_t i = training_batch_size; i < batch_size; ++i) {
         const std::size_t n = i - training_batch_size; // looping 0 -> testing_batch_size
+        testing_order_[n] = n;
         for (std::size_t j = 0; j < input_size_; ++j) {
             tst_in[n * input_size_ + j] = tmp_in[i * input_size_ + j];
         }
@@ -82,6 +84,12 @@ void Dataset::shuffle_training(const std::uint32_t seed) {
     std::mt19937 rng(seed);
     std::ranges::shuffle(training_order_, rng);
     training_cursor_ = 0;
+}
+
+void Dataset::shuffle_testing(const std::uint32_t seed) {
+    std::mt19937 rng(seed);
+    std::ranges::shuffle(testing_order_, rng);
+    testing_cursor_ = 0;
 }
 
 bool Dataset::next_training_batch(std::size_t batch_size, BatchView& out) {
@@ -120,7 +128,7 @@ bool Dataset::next_training_batch(std::size_t batch_size, BatchView& out) {
 
 bool Dataset::next_testing_batch(std::size_t batch_size, BatchView& out) {
     if (batch_size == 0) { return false; }
-    if (testing_cursor_ >= testing().label.shape()[0]) { return false; }
+    if (testing_cursor_ >= testing_order_.size()) { return false; }
 
     if (batch_size > testing_.size) { batch_size = testing_.size; }
 
@@ -142,7 +150,7 @@ bool Dataset::next_testing_batch(std::size_t batch_size, BatchView& out) {
     float* batch_label = testing_batch_.label.data();
 
     for (std::size_t i = 0; i < batch_size; ++i) {
-        const std::size_t src_row = testing_cursor_ + i;
+        const std::size_t src_row = testing_order_[testing_cursor_ + i];
         for (std::size_t j = 0; j < in_dim; ++j) { batch_input[i * in_dim + j] = src_input[src_row * in_dim + j]; }
         for (std::size_t j = 0; j < out_dim; ++j) { batch_label[i * out_dim + j] = src_label[src_row * out_dim + j]; }
     }

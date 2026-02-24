@@ -16,6 +16,8 @@ public:
     BatchView testing() const noexcept { return BatchView(testing_); }
 
     void shuffle_training(std::uint32_t seed);
+    void shuffle_testing(std::uint32_t seed);
+
     bool next_training_batch(std::size_t batch_size, BatchView& out);
     bool next_testing_batch(std::size_t batch_size, BatchView& out);
 
@@ -30,6 +32,7 @@ private:
     std::size_t training_cursor_ = 0;
     Batch training_batch_;
 
+    std::vector<std::size_t> testing_order_;
     std::size_t testing_cursor_ = 0;
     Batch testing_batch_;
 
