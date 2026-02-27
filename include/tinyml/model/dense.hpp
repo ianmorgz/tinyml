@@ -44,7 +44,7 @@ private:
     tensor::Tensor<float> dW_;
     tensor::Tensor<float> dB_;
 
-    std::array<model::ParamRef, 2> params_;
+    std::array<ParamRef, 2> params_;
 };
 
 using DensePtr = std::unique_ptr<Dense>;

@@ -3,6 +3,7 @@
 #include "tinyml/dataset/batch.hpp"
 #include "tinyml/dataset/loader.hpp"
 #include <vector>
+#include <chrono>
 
 namespace tinyml::dataset {
 

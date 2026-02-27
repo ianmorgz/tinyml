@@ -11,7 +11,7 @@ using namespace tinyml;
 
 class MNISTLoader : public dataset::Loader {
 public:
-    MNISTLoader(std::string images_path, std::string labels_path) : images_path_(std::move(images_path)), labels_path_(std::move(labels_path)) {}
+    MNISTLoader(std::string images_path, std::string labels_path) : images_path_(std::move(images_path)), labels_path_(std::move(labels_path)) {};
 
     void load(dataset::Batch& out) const override {
         // Read the labels

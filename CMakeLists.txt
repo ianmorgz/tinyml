@@ -37,6 +37,8 @@ add_library(tinyml
         src/quant/qrelu.cpp
         src/quant/qtanh.cpp
         src/quant/qtest.cpp
+
+        src/codegen/codegen.cpp
 )
 
 target_include_directories(tinyml
@@ -56,12 +58,16 @@ endif()
 
 # ---------- Examples ----------
 if(TINYML_BUILD_EXAMPLES)
-    add_executable(mnist examples/mnist_mlp/main.cpp)
+    add_executable(mnist examples/mnist_mlp/main.cpp
+            include/tinyml/codegen/dense_gen.hpp
+            include/tinyml/codegen/relu_gen.hpp
+            include/tinyml/codegen/codegen.hpp
+            src/codegen/codegen.cpp
+            src/codegen/dense_gen.cpp)
     target_link_libraries(mnist PRIVATE tinyml)
 
-    add_executable(ex_mlp examples/ex_mlp/ex_mlp.cpp
-            include/tinyml/quant/qtest.hpp)
-    target_link_libraries(ex_mlp PRIVATE tinyml)
+    add_executable(xor examples/xor_mlp/main.cpp)
+    target_link_libraries(xor PRIVATE tinyml)
 endif()
 
 # ---------- Tests ----------
@@ -87,8 +93,8 @@ if (TINYML_ENABLE_SANITIZERS AND NOT MSVC)
         target_compile_options(mnist_mlp PRIVATE ${TINYML_SAN_FLAGS})
         target_link_options(mnist_mlp PRIVATE ${TINYML_SAN_FLAGS})
 
-        target_compile_options(ex_mlp PRIVATE ${TINYML_SAN_FLAGS})
-        target_link_options(ex_mlp PRIVATE ${TINYML_SAN_FLAGS})
+        target_compile_options(xor PRIVATE ${TINYML_SAN_FLAGS})
+        target_link_options(xor PRIVATE ${TINYML_SAN_FLAGS})
     endif()
 endif()
 

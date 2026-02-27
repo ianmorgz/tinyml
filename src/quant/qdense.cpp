@@ -5,7 +5,7 @@
 
 namespace tinyml::quant {
 
-QDense::QDense(const model::Dense& d) : weights_(core::Shape{d.in_features(), d.out_features()}), w_scales_(core::Shape{d.out_features()}),
+QDense::QDense(const model::Dense& d) : weights_(core::Shape{d.out_features(), d.in_features()}), w_scales_(core::Shape{d.out_features()}),
     biases_((core::Shape{d.out_features()})),
     in_features_(d.in_features()), out_features_(d.out_features()), out_param_(QParam()),  in_param_(QParam()) {
         quantize_weights(d.weights());
@@ -16,7 +16,7 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
         TINYML_EXCEPTION("Dense Layer Quantization: incorrect rank for fp32 weights");
     }
 
-    if (fp32_weights.shape()[0] != in_features_ || fp32_weights.shape()[1] != out_features_) {
+    if (fp32_weights.shape()[0] != out_features_ || fp32_weights.shape()[1] != in_features_) {
         TINYML_EXCEPTION("Dense Layer Quantization: incorrect shape for fp32 weights");
     }
 
@@ -28,7 +28,7 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
     for (std::size_t o = 0; o < out_features_; ++o) {
         float abs_max = 0.0f;
         for (std::size_t i = 0; i < in_features_; ++i) {
-            const float w = std::abs(w_fp32[i * out_features_ + o]);
+            const float w = std::abs(w_fp32[o * in_features_ + i]);
             if (w > abs_max) abs_max = w;
         }
 
@@ -38,8 +38,8 @@ void QDense::quantize_weights(const tensor::TensorView<const float>& fp32_weight
 
         const float inv_s = 1/channel_param.scale;
         for (std::size_t i = 0; i < in_features_; ++i) {
-            const float q = (w_fp32[i * out_features_ + o] * inv_s);
-            w_i8[i * out_features_ + o] = QParam::clamp_int8(q);
+            const float q = (w_fp32[o * in_features_ + i] * inv_s);
+            w_i8[o * in_features_ + i] = QParam::clamp_int8(q);
         }
     }
 }
@@ -99,7 +99,7 @@ void QDense::forward(tensor::TensorView<const int8_t> in, tensor::TensorView<int
     for (std::size_t o = 0; o < n_o; o++) {
         a_i32[o] = 0;
         for (std::size_t i = 0; i < n_i; i++) {
-            a_i32[o] += (i_i8[i] - in_param_.zero_point) * w_i8[i * n_o + o];
+            a_i32[o] += (i_i8[i] - in_param_.zero_point) * w_i8[o * n_i + i];
         }
         a_i32[o] += b_i32[o];
 

@@ -10,9 +10,9 @@ namespace tinyml::model {
 
 Dense::Dense(const std::uint32_t in_features, const std::uint32_t out_features, const std::size_t alignment)
         : in_features_(in_features), out_features_(out_features),
-        W_(core::Shape{in_features, out_features}, alignment),
+        W_(core::Shape{out_features, in_features}, alignment),
         B_(core::Shape{out_features}, alignment),
-        dW_(core::Shape{in_features, out_features}, alignment),
+        dW_(core::Shape{out_features, in_features}, alignment),
         dB_(core::Shape{out_features}, alignment)
 {
     if (in_features_ == 0 || out_features_ == 0) { TINYML_EXCEPTION("A Dense layer cannot contain input or output size 0"); }
@@ -67,23 +67,22 @@ void Dense::forward(const tensor::TensorView<const float> in, const tensor::Tens
     const float* W = W_.data();
     const float* b = B_.data();
 
-    // y[b, j] = sum_i x[b, i] * W[i, j] + b[j]
     for (std::size_t n = 0; n < batch_size; ++n) {
         const float* x_row = x + n * in_f;
         float* y_row = y + n * out_f;
 
-        for (std::size_t j = 0; j < out_f; ++j) {
-            float acc = b[j];
+        for (std::size_t o = 0; o < out_f; ++o) {
+            float acc = b[o];
             // dot product over in_F
             for (std::size_t i = 0; i < in_f; ++i) {
-                acc += x_row[i] * W[i * out_f + j];
+                acc += x_row[i] * W[o * in_f + i];
             }
-            y_row[j] = acc;
+            y_row[o] = acc;
         }
     }
 }
-// input_gradaient is the previous layer's output (layer_index + 1 because we are looping backwards) [batch_size, output_size]
-// input_cache is the input htat was given during the forward training loop (output of layer - 1)
+// gradient is the previous layer's output (layer_index + 1 because we are looping backwards) [batch_size, output_size]
+// input_cache is the input that was given during the forward training loop (output of layer - 1)
 
 void Dense::backward(const tensor::TensorView<const float> input_grad, const tensor::TensorView<const float> input_cache, tensor::TensorView<float> output_grad) {
     if (input_grad.rank() != 2 || input_cache.rank() != 2 || output_grad.rank() != 2) {
@@ -109,7 +108,6 @@ void Dense::backward(const tensor::TensorView<const float> input_grad, const ten
     const float* X      = input_cache.data();
     float* dX     = output_grad.data();
     const float* W      = W_.data();
-    // const float* B      = B_.data();
     float* dW           = dW_.data();
     float* dB           = dB_.data();
 
@@ -122,7 +120,7 @@ void Dense::backward(const tensor::TensorView<const float> input_grad, const ten
             const float dy = dYb[o];
             dB[o] += dy;
             for (std::size_t i = 0; i < in_features_; ++i) {
-                dW[i * out_features_ + o] += dy * Xb[i];
+                dW[o * in_features_ + i] += dy * Xb[i];
             }
         }
     }
@@ -140,7 +138,7 @@ void Dense::backward(const tensor::TensorView<const float> input_grad, const ten
             const float dy = dYb[o];
 
             for (std::size_t i = 0; i < in_features_; ++i) {
-                dXb[i] += dy * W[i * out_features_ + o];
+                dXb[i] += dy * W[o * in_features_ + i];
             }
         }
     }
