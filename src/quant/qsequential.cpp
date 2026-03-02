@@ -33,12 +33,12 @@ QSequential::QSequential(model::Sequential& net, dataset::Dataset& ds, const std
 
 }
 void QSequential::make_layers(const model::Sequential &net) {
-    num_layers = net.num_layers();
+    num_layers_ = net.num_layers();
     layer_sizes_ = net.layer_sizes();
     max_layer_size_ = net.max_features();
-    layers_.reserve(num_layers);
+    layers_.reserve(num_layers_);
 
-    for (size_t i = 0; i < num_layers; ++i) {
+    for (size_t i = 0; i < num_layers_; ++i) {
         const auto& L = net.layer(i);
         // create empty qLayers by type
         switch (L.type()) {
@@ -84,7 +84,7 @@ void QSequential::callibrate(model::Sequential &net, dataset::Dataset &ds, const
 
         bool write_to_a = true;
 
-        for (std::size_t j = 0; j < num_layers; ++j) {
+        for (std::size_t j = 0; j < num_layers_; ++j) {
             tensor::TensorView out_view(write_to_a ? act_a.data() : act_b.data(), {batch_size,  layer_sizes_[j+1]});
 
             net.layer(j).forward(in_view, out_view);
@@ -101,9 +101,9 @@ void QSequential::finalize(model::Sequential &net) {
     input_param_ = QParam(c_max, c_min, QType::Asymmetric);
     QParam qp = input_param_;
 
-    for (std::size_t i = 0; i < num_layers; ++i) {
+    for (std::size_t i = 0; i < num_layers_; ++i) {
         qp = layers_.at(i)->finalize_calibration(net.layer(i), qp);
-        if (i == num_layers - 1) {
+        if (i == num_layers_ - 1) {
             output_param_ = qp;
         }
     }

@@ -5,7 +5,7 @@
 #include "model_data.h"
 
 // Layer 0 dense layer
-static const int8_t dense0_W[784*128] = {
+static const int8_t dense0_weights[784*128] = {
     0 // ...generated... //
 };
 

@@ -11,6 +11,13 @@
  */
 
 namespace tinyml::quant {
+
+enum class QLayer_Type : std::uint8_t {
+    QDense,
+    QReLu,
+    QTanh,
+};
+
 class QLayer {
 public:
     virtual ~QLayer() = default;
@@ -26,5 +33,8 @@ public:
 
     // check if the layer has been calibrated
     virtual bool calibrated() const noexcept = 0;
+
+    virtual QLayer_Type type() const noexcept = 0;
 };
+
 }

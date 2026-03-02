@@ -17,6 +17,10 @@ public:
     void observe_fp32_output(tensor::TensorView<const float> out) override;
     QParam finalize_calibration(const model::Layer& layer, const QParam input_param) override;
     bool calibrated() const noexcept override { return calibrated_; };
+    QLayer_Type type() const noexcept override { return QLayer_Type::QDense; }
+
+    std::size_t in_features() const noexcept{ return in_features_; }
+    std::size_t out_features() const noexcept{ return out_features_; }
 
 private:
     bool calibrated_ = false;

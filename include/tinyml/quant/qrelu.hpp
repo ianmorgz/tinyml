@@ -12,6 +12,7 @@ public:
     void observe_fp32_output(const tensor::TensorView<const float> out) override { (void)out; /* do nothing */ }
     QParam finalize_calibration(const model::Layer& layer, QParam input_param) override;
     bool calibrated() const noexcept override { return calibrated_; }; // quantized Relu  does not require quantization
+    QLayer_Type type() const noexcept override { return QLayer_Type::QReLu; }
 private:
     bool calibrated_ = false;
     QParam param_;

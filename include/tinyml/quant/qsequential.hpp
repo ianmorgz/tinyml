@@ -15,9 +15,13 @@ public:
     // TODO change forward pipleline into an arguement return instead of a trad return
     void forward(const tensor::TensorView<const float> &in, tensor::TensorView<float> &out) const;
 
+    // getters
+    std::size_t num_layers() const { return num_layers_; }
+    QLayer& get_layer(const std::size_t layer_index) const { return *layers_.at(layer_index); };
+
 private:
     std::vector<std::unique_ptr<QLayer>> layers_;
-    std::size_t num_layers;
+    std::size_t num_layers_;
     std::vector<std::size_t> layer_sizes_;
     std::size_t max_layer_size_;
 

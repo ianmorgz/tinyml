@@ -39,6 +39,7 @@ add_library(tinyml
         src/quant/qtest.cpp
 
         src/codegen/codegen.cpp
+        src/codegen/dense_gen.cpp
 )
 
 target_include_directories(tinyml
