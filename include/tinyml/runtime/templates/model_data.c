@@ -9,7 +9,7 @@ static const int8_t dense0_weights[784*128] = {
     0 // ...generated... //
 };
 
-static const int8_t dense0_Bacc[128] = {
+static const int8_t dense0_Bacc[128] = { //TODO convert to int8
     0 // ...generated... //
 };
 
@@ -31,7 +31,7 @@ static const DenseLayer dense0_layer = {
     .mult      = dense0_mult,
     .shift     = dense0_shift,
   //   .w_row_sum = dense0_w_row_sum,
-  };
+};
 
 const Model model = {
     .in_dim     = 784,

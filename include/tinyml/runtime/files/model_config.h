@@ -54,7 +54,6 @@ typedef struct {
 
 typedef struct {
     int32_t zp;
-    int16_t dim;
 } ReLuLayer;
 
 // initialization function

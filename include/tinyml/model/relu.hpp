@@ -19,6 +19,5 @@ public:
     core::Shape infer_output_shape(const core::Shape &in) const override { return in;}
     void forward(tensor::TensorView<const float> in, tensor::TensorView<float> out) const override;
     void backward(tensor::TensorView<const float> grad_input, tensor::TensorView<const float> cached, tensor::TensorView<float> grad_output) override;
-
 };
 }

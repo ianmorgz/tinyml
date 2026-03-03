@@ -40,6 +40,7 @@ add_library(tinyml
 
         src/codegen/codegen.cpp
         src/codegen/dense_gen.cpp
+        src/codegen/relu_gen.cpp
 )
 
 target_include_directories(tinyml
@@ -64,7 +65,10 @@ if(TINYML_BUILD_EXAMPLES)
             include/tinyml/codegen/relu_gen.hpp
             include/tinyml/codegen/codegen.hpp
             src/codegen/codegen.cpp
-            src/codegen/dense_gen.cpp)
+            src/codegen/dense_gen.cpp
+            src/codegen/relu_gen.cpp
+            include/tinyml/codegen/model_gen.hpp
+            src/codegen/model_gen.cpp)
     target_link_libraries(mnist PRIVATE tinyml)
 
     add_executable(xor examples/xor_mlp/main.cpp)

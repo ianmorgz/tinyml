@@ -2,19 +2,20 @@
 #include "tinyml/core/config.hpp"
 #include "tinyml/quant/qsequential.hpp"
 #include "tinyml/quant/qlayer.hpp"
+#include "tinyml/quant/qdense.hpp"
+#include "tinyml/quant/qrelu.hpp"
+#include "tinyml/codegen/dense_gen.hpp"
+#include "tinyml/codegen/relu_gen.hpp"
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
-
-#include "tinyml/codegen/dense_gen.hpp"
 
 namespace tinyml::codegen {
 
 namespace fs = std::filesystem;
 
 void generate(const quant::QSequential& model, const std::string &template_folder, const std::string &out_folder, const std::string &model_name) {
-    copy_files(template_folder, out_folder);
+    // copy_files(template_folder, out_folder);
     generate_data(model, out_folder);
 
 }
@@ -47,6 +48,8 @@ void generate_data(const quant::QSequential& model, const std::string& out_folde
                 break;
             }
             case quant::QLayer_Type::QReLu: {
+                const auto& r = static_cast<const quant::QRelu&>(l);
+                generate_relu(data_file, r, i);
                 break;
             }
             default: {
@@ -55,5 +58,4 @@ void generate_data(const quant::QSequential& model, const std::string& out_folde
         }
     }
 }
-
 }

@@ -22,6 +22,9 @@ public:
     std::size_t in_features() const noexcept{ return in_features_; }
     std::size_t out_features() const noexcept{ return out_features_; }
 
+    const QParam* in_param() const noexcept{ return &in_param_; }
+    const QParam* out_param() const noexcept{ return &out_param_; }
+
 private:
     bool calibrated_ = false;
 

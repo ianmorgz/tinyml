@@ -5,6 +5,6 @@
 
 namespace tinyml::codegen {
 
-void generate_dense(std::ofstream& file, const quant::QDense& qlayer, const std::size_t layer_idx);
+void generate_dense(std::ofstream& file, const quant::QDense& qdense, std::size_t layer_idx);
 
 }
