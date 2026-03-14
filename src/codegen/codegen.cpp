@@ -10,11 +10,13 @@
 #include <filesystem>
 #include <fstream>
 
+#include "tinyml/codegen/model_gen.hpp"
+
 namespace tinyml::codegen {
 
 namespace fs = std::filesystem;
 
-void generate(const quant::QSequential& model, const std::string &template_folder, const std::string &out_folder, const std::string &model_name) {
+void generate(const quant::QSequential& model, const std::string &template_folder, const std::string &out_folder) {
     // copy_files(template_folder, out_folder);
     generate_data(model, out_folder);
 
@@ -57,5 +59,7 @@ void generate_data(const quant::QSequential& model, const std::string& out_folde
             }
         }
     }
+
+    generate_model(model, data_file);
 }
 }

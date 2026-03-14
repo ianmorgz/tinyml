@@ -14,7 +14,7 @@ typedef struct {
     int8_t* act1;
     size_t act_cap;
 
-    // dense accumulator scratch
+    // dense accumulator
     int32_t* acc;
     size_t acc_cap;
 } ModelCtx;

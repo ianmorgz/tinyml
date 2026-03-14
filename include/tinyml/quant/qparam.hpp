@@ -80,7 +80,7 @@ struct QParam {
                 scale = diff < 1e-12f ? 1.0f : diff / 254.0f;
 
                 const float zp = diff < 1e-12f ? 0 : -127.0f - min / scale;
-                zero_point = clamp_int8(zp);
+                zero_point = clamp_int8(std::lrintf(zp));
                 break;
             }
             default: {
@@ -119,7 +119,7 @@ struct QParam {
         const float s = param.scale;
         const int8_t z = param.zero_point;
 
-        for (std::size_t i = 0; i < n; i++) { o_fp32[i] = static_cast<float>(i_i8[i] - z) * s; }
+        for (std::size_t i = 0; i < n; i++) { o_fp32[i] = static_cast<float>(i_i8[i] + z) * s; }
     }
 };
 

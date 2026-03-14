@@ -5,6 +5,13 @@
 #include "tinyml/model/sequential.hpp"
 #include "tinyml/quant/qtest.hpp"
 #include "tinyml/train/fit.hpp"
+#include "tinyml/codegen/codegen.hpp"
+// MNIST example
+// meant to show training and quantization.
+// NOT meant to be used in embedded systems until
+// some form of weight chunking is initazlized as
+// quantized weights alone are ~100 Kb
+
 
 using namespace tinyml;
 
@@ -33,4 +40,5 @@ int main() {
     // quantize and test the model
     quant::QSequential qnet(model, dataset, 10000);
     quant::qtest(qnet, dataset);
+
 };

@@ -47,8 +47,9 @@ void fit(model::Sequential& model, dataset::Dataset& dataset, const Config &conf
     std::int32_t correct = 0;
     std::size_t total = 0;
     const std::size_t classes = model.output_features();
+    dataset.shuffle_training(56);
 
-    while (dataset.next_testing_batch(config.batch_size, batch)) {
+    while (dataset.next_training_batch(config.batch_size, batch)) {
         auto output = model.forward(batch.input);
         const float* outp = output.data();
         const float* tgt  = batch.label.data();

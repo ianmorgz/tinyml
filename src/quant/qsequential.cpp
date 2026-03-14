@@ -98,7 +98,7 @@ void QSequential::callibrate(model::Sequential &net, dataset::Dataset &ds, const
 }
 
 void QSequential::finalize(model::Sequential &net) {
-    input_param_ = QParam(c_max, c_min, QType::Asymmetric);
+    input_param_ = QParam(c_max, c_min, QType::Symmetric);
     QParam qp = input_param_;
 
     for (std::size_t i = 0; i < num_layers_; ++i) {
@@ -116,6 +116,8 @@ void QSequential::forward(const tensor::TensorView<const float> &in, tensor::Ten
         TINYML_EXCEPTION("Quantized Sequential model forward given invalid size");
     }
 
+
+
     tensor::Tensor<int8_t> act_a({max_layer_size_});
     tensor::Tensor<int8_t> act_b({max_layer_size_});
 
@@ -123,6 +125,7 @@ void QSequential::forward(const tensor::TensorView<const float> &in, tensor::Ten
 
     tensor::Tensor<int8_t> q_in(in.shape());
     QParam::quantize_i8(in, q_in.view(), input_param_);
+    // std::cout << "in: " << static_cast<int>(q_in.data()[0]) << ", " << static_cast<int>(q_in.data()[1]) << "\n";
 
     auto in_view = q_in.view().as_const();
 
@@ -136,6 +139,12 @@ void QSequential::forward(const tensor::TensorView<const float> &in, tensor::Ten
         layers_[i]->forward(in_view, out_view);
         in_view = out_view.as_const();
         write_to_a = !write_to_a;
+
+        // std::cout << "Output layer " << i << ": ";
+        // for (size_t j = 0; j < in_view.size(); ++j) {
+        //     std::cout << static_cast<int>(in_view.data()[j]) << " ";
+        // }
+        // std::cout << "\n";
     }
 
 

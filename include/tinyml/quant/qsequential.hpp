@@ -19,6 +19,9 @@ public:
     std::size_t num_layers() const { return num_layers_; }
     QLayer& get_layer(const std::size_t layer_index) const { return *layers_.at(layer_index); };
 
+    const QParam* in_param() const { return &input_param_; }
+    const QParam* out_param() const { return &output_param_; }
+
 private:
     std::vector<std::unique_ptr<QLayer>> layers_;
     std::size_t num_layers_;

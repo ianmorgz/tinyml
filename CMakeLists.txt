@@ -41,6 +41,7 @@ add_library(tinyml
         src/codegen/codegen.cpp
         src/codegen/dense_gen.cpp
         src/codegen/relu_gen.cpp
+        src/codegen/model_gen.cpp
 )
 
 target_include_directories(tinyml

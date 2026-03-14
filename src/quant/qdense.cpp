@@ -61,7 +61,7 @@ QParam QDense::finalize_calibration(const model::Layer& layer, const QParam inpu
     if (layer.type() != model::LayerType::Dense) { TINYML_EXCEPTION("Quantized Dense FInalize Callibration float layer was not type dense"); }
 
     // set the params
-    out_param_ = QParam(c_max, c_min, QType::Asymmetric);
+    out_param_ = QParam(c_max, c_min, QType::Symmetric);
     in_param_ = input_param;
 
     // fill out biases
@@ -96,16 +96,18 @@ void QDense::forward(tensor::TensorView<const int8_t> in, tensor::TensorView<int
     if (n_o != out_features_) { TINYML_EXCEPTION("Quantized Dense forward input tensor incorectly sized"); }
     if (n_i != in_features_) { TINYML_EXCEPTION("Quantized Dense forward output tensor incorectly sized"); }
 
+    // std::cout << "DEBUG: ";
     for (std::size_t o = 0; o < n_o; o++) {
-        a_i32[o] = 0;
+        a_i32[o] =  b_i32[o];
         for (std::size_t i = 0; i < n_i; i++) {
             a_i32[o] += (i_i8[i] - in_param_.zero_point) * w_i8[o * n_i + i];
         }
-        a_i32[o] += b_i32[o];
 
         const float M = (in_param_.scale * ws_fp32[o]) / out_param_.scale ;
         o_i8[o] = QParam::clamp_int8(std::round(a_i32[o] * M) + out_param_.zero_point);
+        // std::cout << static_cast<int>(o_i8[o]) << " ";
     }
+    // std::cout << std::endl;
 }
 
 }

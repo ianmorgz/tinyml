@@ -1,4 +1,5 @@
 #include "tinyml/quant/qrelu.hpp"
+#include <math.h>
 
 namespace tinyml::quant {
 
@@ -8,9 +9,14 @@ void QRelu::forward(const tensor::TensorView<const int8_t> in, tensor::TensorVie
     int8_t* o = out.data();
     const std::size_t n = in.size();
 
+    // std:: cout << "DEBUG: ";
     for (std::size_t j = 0; j < n; ++j) {
         o[j] = std::max(i[j], param_.zero_point);
+        // std::cout << static_cast<int>(o[j]) << " ";
     }
+    // std::cout << std::endl;
+
+
 }
 
 QParam QRelu::finalize_calibration(const model::Layer& layer, const QParam input_param) {

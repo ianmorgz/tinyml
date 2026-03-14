@@ -18,7 +18,7 @@ int main() {
     model.build(2, 800);
 
     train::fit(model, dataset, {
-        .epochs = 5,
+        .epochs = 500,
         .batch_size = 800,
         .learning_rate = 0.01f,
         .optimizer = train::Optimizer::SGD,
@@ -29,5 +29,5 @@ int main() {
     quant::QSequential qnet(model, dataset, 200);
     quant::qtest(qnet, dataset);
 
-    codegen::generate(qnet, "../include/tinyml/runtime/files", "../out", "xor_mlp");
+    codegen::generate(qnet, "../include/tinyml/runtime/files", "../out");
 };

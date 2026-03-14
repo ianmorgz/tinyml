@@ -7,7 +7,7 @@ namespace tinyml::quant {
 
 void qtest(QSequential& qnet, dataset::Dataset& dataset) {
     std::cout << "\rTesting..." << std::flush;
-    dataset.shuffle_testing(142); //TODO shuffle the testing dataset
+    dataset.shuffle_training(142); //TODO shuffle the testing dataset
     dataset::BatchView batch_view;
 
     std::size_t label_size = dataset.label_size();
@@ -18,7 +18,7 @@ void qtest(QSequential& qnet, dataset::Dataset& dataset) {
 
     std::uint32_t total = 0;
     std::uint32_t correct = 0;
-    while (dataset.next_testing_batch(1, batch_view)){
+    while (dataset.next_training_batch(1, batch_view)){
         auto in = batch_view.input;
         auto lbl = batch_view.label;
 

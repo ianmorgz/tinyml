@@ -56,7 +56,6 @@ bool validate_model(const Model* m, size_t* act_cap, size_t* acc_cap){
 // make sure that the arena had been initialized
 // @return false if initialization fails, true otherwise
 
-// TODO how do we set up the arena?
 bool model_init_ctx(const Model* m, ModelCtx* ctx, Arena* arena){
     if(!m || !ctx || !arena) { return false; } // safety check
 
@@ -68,8 +67,8 @@ bool model_init_ctx(const Model* m, ModelCtx* ctx, Arena* arena){
     ctx->acc_cap = acc_cap;
 
     // set up activation buffers
-    ctx->act0 = (int8_t*)arena_alloc(arena, ctx->act_cap * sizeof(int8_t), 16); // the first activation buffer
-    ctx->act1 = (int8_t*)arena_alloc(arena, ctx->act_cap * sizeof(int8_t), 16); // the second activation buffer
+    ctx->act0 = (int8_t*)arena_alloc(arena, ctx->act_cap * sizeof(int8_t), 16);
+    ctx->act1 = (int8_t*)arena_alloc(arena, ctx->act_cap * sizeof(int8_t), 16);
 
     // set up accumulation buffer
     ctx->acc = (int32_t*)arena_alloc(arena, ctx->acc_cap * sizeof(int32_t), 16);
