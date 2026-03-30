@@ -20,7 +20,7 @@ void model_init(void) {
 
 
 void forward(const float* in, float* out) {
-	if(model_forward(&model, &ctx, in, out) < -1){
+	if(model_forward(&model, &ctx, in, out) < 0){
 		while(1) {
 			printf("Error\n");
 		}

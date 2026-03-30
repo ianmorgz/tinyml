@@ -23,8 +23,8 @@ typedef struct {
 typedef enum { L_DENSE, L_RELU } LayerType;
 
 typedef struct {
-    LayerType type;
-    const void* layer;
+	LayerType type;
+	const void* layer;
 } LayerRef;
 
 typedef struct {

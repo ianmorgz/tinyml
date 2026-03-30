@@ -31,11 +31,8 @@ int model_init_ctx(const ModelRef* m, ModelCtx* ctx, Arena* arena){
 
 
 int model_forward(const ModelRef* m, const ModelCtx* ctx, const float* in, float* out){
-	int8_t act_0[MAX_ACT_SIZE];
-	int8_t act_1[MAX_ACT_SIZE];
-
-	int8_t* act_in = act_0;
-	int8_t* act_out = act_1;
+	int8_t* act_in = ctx->act0;
+	int8_t* act_out = ctx->act1;
 
 	quantize(in, act_in, m->in_dim, m->in_scale, m->in_zp);
 
@@ -80,7 +77,7 @@ int dense_forward(const int8_t* input, int8_t* output, const DenseLayer* dense, 
 
 		for(size_t i = 0; i < n_in; i++){
 			size_t idx = o * n_in + i;
-			acc[0] += weights[idx] * (input[i] - in_zp);
+			acc[o] += weights[idx] * (input[i] - in_zp);
 		}
 
 		acc[o] = (int32_t)lrintf((float)acc[o] * multipliers[o]) + out_zp;
