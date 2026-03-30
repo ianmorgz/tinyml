@@ -6,6 +6,7 @@ This project is an end-to-end pipeline for deploying neural networks on microcon
 * Allocation free: TinyML's generated C code is free of dynamic memory which allows a small footprint to run alongside your project.
 * Drag and drop design: Code generated with TinyML can simply be copied into your existing embedded projects, with a just two callable functions to set up and run, allowing for it to be used at your own digression. 
 ## How to use it?
-download link here
+Still in production - coming soon
 ## Where is TinyML going?
-what all i want to add
+* New layer types
+* Int only embededded inference
